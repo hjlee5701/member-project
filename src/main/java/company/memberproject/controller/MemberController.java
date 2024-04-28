@@ -37,3 +37,10 @@ public class MemberController {
         log.info("Member join completed for userID: {}", createMemberRequest.getUserId());
         return new ResponseEntity<>(member, HttpStatus.CREATED);
     }
+    private ResponseEntity<?> validationError(List<FieldError> fieldErrors){
+        List<String> errors = fieldErrors.stream()
+                .map(fieldError -> fieldError.getField() + ": " + fieldError.getDefaultMessage())
+                .collect(Collectors.toList());
+        return ResponseEntity.badRequest().body(errors);
+    }
+
