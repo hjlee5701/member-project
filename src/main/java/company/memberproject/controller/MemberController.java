@@ -25,7 +25,7 @@ public class MemberController {
     private static final String PAGE_SIZE = "10";
 
     @PostMapping("/join")
-    public ResponseEntity<?> join(@RequestBody CreateMemberRequest createMemberRequest,
+    public ResponseEntity<?> join(@RequestBody @Valid CreateMemberRequest createMemberRequest,
                                        BindingResult bindingResult){
 
         if(bindingResult.hasErrors()){
