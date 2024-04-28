@@ -1,9 +1,10 @@
-package company.memberproject.service;
+package company.memberproject;
 
 import company.memberproject.controller.dto.CreateMemberRequest;
 import company.memberproject.controller.dto.UpdateMemberRequest;
 import company.memberproject.domain.Member;
 import company.memberproject.repository.MemberRepository;
+import company.memberproject.service.MemberService;
 import company.memberproject.utility.exception.MemberErrorCode;
 import company.memberproject.utility.exception.MemberException;
 import org.junit.jupiter.api.BeforeEach;
