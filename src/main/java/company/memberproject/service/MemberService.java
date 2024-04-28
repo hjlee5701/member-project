@@ -3,8 +3,11 @@ package company.memberproject.service;
 import company.memberproject.controller.dto.CreateMemberRequest;
 import company.memberproject.domain.Member;
 import company.memberproject.repository.MemberRepository;
+import company.memberproject.utility.exception.MemberErrorCode;
+import company.memberproject.utility.exception.MemberException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -18,6 +21,18 @@ import java.util.function.Supplier;
 public class MemberService {
 
     private final MemberRepository memberRepository;
+
+    private boolean isPresentUserId(String userId) {
+        return memberRepository.findByUserId(userId).isPresent();
+    }
+    private boolean isPresentNickName(String nickName) {
+        return memberRepository.findByNickName(nickName).isPresent();
+    }
+
+    private boolean isPresentEmail(String email) {
+        return memberRepository.findByEmail(email).isPresent();
+    }
+
     @Transactional
     public Member join(CreateMemberRequest createMemberReq) {
         log.info("Attempting to register a new member: {}", createMemberReq.getUserId());
@@ -26,7 +41,20 @@ public class MemberService {
         String nickName = createMemberReq.getNickName();
         String email = createMemberReq.getEmail();
 
-        //TODO 중복체크
+        if (isPresentUserId(userId)) {
+            log.warn("Duplicate userID detected: {}", userId);
+            throw new MemberException(MemberErrorCode.DUPLICATE_USERID);
+        }
+
+        if (isPresentNickName(nickName)) {
+            log.warn("Duplicate nickname detected: {}", nickName);
+            throw new MemberException(MemberErrorCode.DUPLICATE_NICKNAME);
+        }
+
+        if (isPresentEmail(email)) {
+            log.warn("Duplicate email detected: {}", email);
+            throw new MemberException(MemberErrorCode.DUPLICATE_EMAIL);
+        }
 
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
         String secretPw = encoder.encode(createMemberReq.getPassword());
