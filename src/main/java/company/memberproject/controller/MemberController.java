@@ -37,6 +37,19 @@ public class MemberController {
         log.info("Member join completed for userID: {}", createMemberRequest.getUserId());
         return new ResponseEntity<>(member, HttpStatus.CREATED);
     }
+
+    @GetMapping("/list")
+    public ResponseEntity<List<Member>> getList(@RequestParam(name="page", defaultValue = "1") int page,
+                                                @RequestParam(name="pageSize", defaultValue = PAGE_SIZE) int pageSize){
+
+        log.info("Retrieving member list for page: {}, pageSize: {}", page, pageSize);
+
+        List<Member> memberList = memberService.getList(page, pageSize);
+
+        log.info("Members retrieved for page: {}", page);
+
+        return new ResponseEntity<>(memberList, HttpStatus.OK);
+    }
     private ResponseEntity<?> validationError(List<FieldError> fieldErrors){
         List<String> errors = fieldErrors.stream()
                 .map(fieldError -> fieldError.getField() + ": " + fieldError.getDefaultMessage())

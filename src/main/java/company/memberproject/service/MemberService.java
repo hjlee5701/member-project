@@ -1,12 +1,17 @@
 package company.memberproject.service;
 
 import company.memberproject.controller.dto.CreateMemberRequest;
+import company.memberproject.controller.dto.UpdateMemberRequest;
 import company.memberproject.domain.Member;
 import company.memberproject.repository.MemberRepository;
 import company.memberproject.utility.exception.MemberErrorCode;
 import company.memberproject.utility.exception.MemberException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -65,4 +70,17 @@ public class MemberService {
         log.info("Member registration successful for: {}", createMemberReq.getUserId());
         return member;
     }
+
+    @Transactional
+    public List<Member> getList(int page, int pageSize) {
+        Sort sort = Sort.by(Sort.Order.desc("regAt"), Sort.Order.asc("name"));
+        Pageable pageable = PageRequest.of(page - 1, pageSize, sort);
+
+        log.info("Retrieving member list for page: {}", page);
+        Page<Member> memberPage = memberRepository.findAll(pageable);
+        log.info("Members retrieved for page: {}", page);
+
+        return memberPage.getContent();
+    }
+
 }
