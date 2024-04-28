@@ -54,6 +54,11 @@ public class Member {
     }
 
 
+    public void updateMember(String nickName, String phoneNumber, String email){
+        this.nickName = nickName;
+        this.phoneNumber = phoneNumber;
+        this.email = email;
+    }
 
 
 }

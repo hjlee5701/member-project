@@ -18,7 +18,6 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Supplier;
 
 @Service
 @RequiredArgsConstructor
@@ -83,4 +82,35 @@ public class MemberService {
         return memberPage.getContent();
     }
 
+    @Transactional
+    public Member update(String userId, UpdateMemberRequest updateMemberReq) {
+        log.info("Updating member: {}", userId);
+        Optional<Member> maybeMember = memberRepository.findByUserId(userId);
+
+        if (!maybeMember.isPresent()) {
+            log.error("No member found with userID: {}", userId);
+            throw new MemberException(MemberErrorCode.NOT_MEMBER);
+        }
+
+        Member member = maybeMember.get();
+        String newEmail = updateMemberReq.getEmail();
+        String newPhoneNumber = updateMemberReq.getPhoneNumber();
+        String newNickName = updateMemberReq.getNickName();
+
+        if (newEmail != null && !member.getEmail().equals(newEmail) && isPresentEmail(newEmail)) {
+
+            log.warn("Duplicate email detected during update: {}", newEmail);
+            throw new MemberException(MemberErrorCode.DUPLICATE_EMAIL);
+        }
+
+        if (newNickName != null && !member.getNickName().equals(newNickName) && isPresentNickName(newNickName)) {
+            log.warn("Duplicate nickname detected during update: {}", newNickName);
+            throw new MemberException(MemberErrorCode.DUPLICATE_NICKNAME);
+        }
+
+        member.updateMember(newNickName, newPhoneNumber, newEmail);
+        memberRepository.save(member);
+        log.info("Member update successful for: {}", userId);
+        return member;
+    }
 }

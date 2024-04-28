@@ -1,6 +1,7 @@
 package company.memberproject.controller;
 
 import company.memberproject.controller.dto.CreateMemberRequest;
+import company.memberproject.controller.dto.UpdateMemberRequest;
 import company.memberproject.domain.Member;
 import company.memberproject.service.MemberService;
 import lombok.RequiredArgsConstructor;
@@ -50,6 +51,21 @@ public class MemberController {
 
         return new ResponseEntity<>(memberList, HttpStatus.OK);
     }
+
+    @PatchMapping("/{userId}")
+    public ResponseEntity<?> update(@PathVariable("userId") String userId,
+                                    @Valid @RequestBody UpdateMemberRequest updateMemberRequest,
+                                    BindingResult bindingResult) {
+        if(bindingResult.hasErrors()){
+            return validationError(bindingResult.getFieldErrors());
+        }
+
+        log.debug("Attempting to update member with userId: {}", userId);
+        Member member = memberService.update(userId, updateMemberRequest);
+        log.debug("Member update completed for userId: {}", userId);
+        return new ResponseEntity<>(member, HttpStatus.OK);
+    }
+
     private ResponseEntity<?> validationError(List<FieldError> fieldErrors){
         List<String> errors = fieldErrors.stream()
                 .map(fieldError -> fieldError.getField() + ": " + fieldError.getDefaultMessage())
@@ -57,3 +73,4 @@ public class MemberController {
         return ResponseEntity.badRequest().body(errors);
     }
 
+}
